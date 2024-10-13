@@ -53,10 +53,12 @@ export default function SearchResultPage({}: Props) {
     const observer = useRef<any>()
     const Baseurl = `https://leetcode-questions-companywise-backend.onrender.com?page=${page}`
     useEffect(()=>{
+        setLoading(true)
         fetch(Baseurl).then(async v=>{
             const d = await v.json()
             
             setData([...data,...d])
+            setLoading(false)
         })
     },[page])
     

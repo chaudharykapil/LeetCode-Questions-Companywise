@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 type Props = {}
 type RowProp = {data:{id:number,question_name:string,difficulty:string,acceptence_rate:string,companies:string,frequency:number,leetcode_link:string}}
@@ -49,8 +49,9 @@ function ResutTableRow({data}:RowProp){
 export default function SearchResultPage({}: Props) {
     const [data,setData] = useState<any[]>([])
     const [page,setPage] = useState<number>(1)
-    const lastrowref = useRef<any>()
-    const Baseurl = `http://127.0.0.1:5000?page=${page}`
+    const [loading,setLoading] = useState<boolean>(false)
+    const observer = useRef<any>()
+    const Baseurl = `https://leetcode-questions-companywise-backend.onrender.com?page=${page}`
     useEffect(()=>{
         fetch(Baseurl).then(async v=>{
             const d = await v.json()
@@ -58,22 +59,20 @@ export default function SearchResultPage({}: Props) {
             setData([...data,...d])
         })
     },[page])
-    useEffect(()=>{
-        const observer = new IntersectionObserver((entries=>{
-            if(entries[0].isIntersecting){
-                
-                setPage(page+1)
+    
+    const lastElementRef = useCallback((node:any) => {
+        if (loading) return;
+
+        if (observer.current) observer.current.disconnect();
+
+        observer.current = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                setPage((prevPage) => prevPage + 1);
             }
-        }),{threshold:1})
-        if(lastrowref.current){
-            observer.observe(lastrowref.current)
-        }
-        return ()=>{
-            if(lastrowref.current){
-                observer.unobserve(lastrowref.current)
-            }
-        }
-    })
+        });
+
+        if (node) observer.current.observe(node);
+    }, [loading]);
   return (
     <div className="p-5">
         <div>
@@ -124,7 +123,7 @@ export default function SearchResultPage({}: Props) {
                                 <ResutTableRow key={idx} data={val} />
                             )
                         }
-                        <tr ref={lastrowref} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-center">
+                        <tr ref={lastElementRef} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-center">
                             <th colSpan={6}>Loading...</th>
                         </tr>
                     </tbody>

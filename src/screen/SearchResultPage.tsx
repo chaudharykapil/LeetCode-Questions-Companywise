@@ -27,7 +27,7 @@ function ResutTableRow({data}:RowProp){
             <td className="px-6 py-4">
                 <div className="grid grid-cols-6 gap-y-2">
                 {JSON.parse(data.companies).map((val:string)=>
-                <span className="bg-green-100 text-green-800 text-xs font-medium me-2 px-1 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
+                <span className="bg-green-100 text-center text-green-800 text-xs font-medium me-2 px-1 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
                     {val}
                 </span>
                 )}
